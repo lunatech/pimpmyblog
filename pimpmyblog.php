@@ -33,8 +33,13 @@ function create_mail_sig($template,$title,$link)
   return $tmpl;
 }
 
-$blog_rss_url = "http://rajshekhar.net/blog/feeds/index.rss2";
-$f_template = "/Users/rshekhar/personal/programming/pimpmyblog/mysig.tpl";
+$opts = getopt('u:t:');
+if (!( key_exists('u',$opts) && key_exists('t',$opts))) {
+  die("required args not passed\n");
+}
+
+$blog_rss_url = $opts['u'];
+$f_template = $opts['t'];
 
 $blog_xml = fetch_url($blog_rss_url);
 $last_blog = fetch_last_post($blog_xml);
