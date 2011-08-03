@@ -6,11 +6,12 @@ use warnings;
 use LWP;
 use Getopt::Long;
 use XML::LibXML;
-use Data::Dumper;
+#use Data::Dumper;
 
 sub print_usage {
   my $usage = <<USAGE;
 $0 : -f "url of the blog" [-t "template file"] [-o "output file"]
+if no -o is specified, it prints on STDOUT
 USAGE
   
 print $usage;
@@ -37,16 +38,26 @@ sub fetch_feed {
 
 
 sub parse_feed {
+  # to id a feed do - 'name(/*)' 
   my $xml_str = shift;
   my $parser = XML::LibXML->new();
   my $doc = $parser->parse_string($xml_str);
+  my $feed_type = $doc->findvalue("name(/*)");
+  my ($query_title,$query_link) ;
   # we just need the first item and first link
-  my $query ;
-  my %res ;
-  $query = "/rss/channel/item[1]/link";
-  $res{"link"} = $doc->findvalue($query);
-  $query = "/rss/channel/item[1]/title";
-  $res{"title"} = $doc->findvalue($query);
+  if ($feed_type eq "feed") {
+    ($query_title,$query_link) = ("/feed/entry[1]/title","/feed/entry[1]/id")
+  }
+  elsif  ($feed_type eq "rss") {
+    ($query_title,$query_link) = ("/rss/channel/item[1]/title","/rss/channel/item[1]/link")
+  }
+  else {
+    $@ = "unknown feed type";
+    return undef;
+  }
+  my %res;
+  $res{"title"} = $doc->findvalue($query_title);
+  $res{"link"} = $doc->findvalue($query_link);
   unless (defined($res{"link"}) and defined ($res{"title"})) {
     $@ = "error in parsing feed";
     return undef;
@@ -55,7 +66,7 @@ sub parse_feed {
 }
 
 my ($feed_url,$tpl_file,$out_file) = 
-   (undef, "/tmp/sig.tpl","/tmp/mysig.txt");
+   (undef, "/tmp/sig.tpl","-");
 
 GetOptions( 
 	   "f|feed=s"		=> \$feed_url,
@@ -82,12 +93,16 @@ while (<TPL>) {
 }
 close TPL;
 
-open OUT,">",$out_file
-  or die ("error opening signature file $out_file with error : " .$!);
+if ($out_file eq "-") {
+  print $sig_str;
+}
+else {
+  open OUT,">",$out_file
+    or die ("error opening signature file $out_file with error : " .$!);
+  print OUT $sig_str;
+  close OUT;    
+}
 
-
-print OUT $sig_str;
-close OUT;
 
 
 
