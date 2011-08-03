@@ -1,0 +1,33 @@
+pimpmyblog.pl : -f "url of the blog" [-t "template file"] [-o "output file"]
+if no -o is specified, it prints on STDOUT
+
+* Sample run
+
+This is my template file
+
+Raj Shekhar
+-
+Simon: I swear... when it's appropriate.
+Kaylee: Simon, the whole point of swearing is that it ain't appropriate.
+- 
+Read the latest at my blog: "!title!" <!url!>
+
+----
+
+When I run the above script like this from the command line -
+
+pimpmyblog.pl -t ./mysig.tpl  -f "http://news.yahoo.com/rss/" 
+
+This outputs -->
+
+Raj Shekhar
+-
+Simon: I swear... when it's appropriate.
+Kaylee: Simon, the whole point of swearing is that it ain't appropriate.
+- 
+Read the latest at my blog: "Debt is a done deal, but peace truce already fades" <http://news.yahoo.com/debt-done-deal-peace-truce-already-fades-211237343.html>
+
+
+I can send this output to a file "/tmp/mysig.txt"
+
+pimpmyblog.pl -t ./mysig.tpl  -f "http://news.yahoo.com/rss/" -o /tmp/mysig.txt

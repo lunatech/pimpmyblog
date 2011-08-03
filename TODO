@@ -3,3 +3,6 @@
 * Add a "decay" functionality
 This will not add the blog line to the signature if it is more than N
 days old
+
+* Fix atom parsing
+Cannot parse Atom feeds correctly right now.  Fix it.
